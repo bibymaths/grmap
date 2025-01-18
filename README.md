@@ -77,9 +77,10 @@ perl read_pattern.pl
 - Validates `.fasta.gz` file paths.
 - Prompts for re-execution if invalid options are entered.
 
-## Author
-**Abhinav Mishra** (Group 7)
+## Author 
+
+**Abhinav Mishra** 
+mishraabhinav36@gmail.com
 
 ## License
 This project is licensed under the MIT License.
-
