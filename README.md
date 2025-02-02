@@ -1,7 +1,7 @@
 
 ## Genomic Read Matching and Annotation Pipeline (GRMAP)
  
-A bioinformatics pipeline** for **matching sequencing reads to a reference genome and annotating the matched sequences** with genomic features.
+A bioinformatics pipeline for **matching sequencing reads to a reference genome and annotating the matched sequences** with genomic features.
 
 ### **📌 Overview of the Workflow**
 1. **Script 1: Read Matching & Extraction**  
