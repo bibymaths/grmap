@@ -81,7 +81,7 @@ my %reads_map  = (
     4 => 'illumina_reads_100.fasta.gz',
 );
 my @query_opts = ( 1000, 10_000, 100_000, 1_000_000 );
-my $result_file = 'MatchedMarkers.txt'; 
+my $result_file = 'matchedseqs.txt'; 
  
 # Validate command-line arguments.
 exists $reads_map{$reads_choice} or die "Invalid read file choice: $reads_choice\n";
@@ -161,7 +161,7 @@ print $OUT "# Run End:   $end_timestamp\n";
 print $OUT "# Elapsed Time (s): $elapsed\n";
 print $OUT "# Memory Usage at Start: " . format_memory_usage($start_mem) . "\n";
 print $OUT "# Memory Usage at End:   " . format_memory_usage($end_mem) . "\n";
-print $OUT "# Columns: Start\tEnd\tStrand\tMatchedSequence\tMarkerID\tLength\tOccurrenceCount\tUpstreamContext\tDownstreamContext\n";
+print $OUT "Start\tEnd\tStrand\tMatchedSequence\tMarkerID\tLength\tOccurrenceCount\tUpstreamContext\tDownstreamContext\n";
 
 my $total_matched = 0;
 foreach my $child_pid (@child_pids) {

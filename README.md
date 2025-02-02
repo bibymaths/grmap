@@ -1,70 +1,39 @@
-# Read Pattern Tool
 
-## Overview
-This Perl script matches marker sequences from Illumina reads (lengths: 40, 60, 80, 100) to the partial hg38 reference genome. It calculates how many of these markers appear in chromosome 1 of hg38. Results include matched sequences, runtime, and memory benchmarks.
+## Genomic Read Matching and Annotation Pipeline (GRMAP)
+ 
+A bioinformatics pipeline** for **matching sequencing reads to a reference genome and annotating the matched sequences** with genomic features.
 
-## Features
-- Supports `.fasta.gz` input files to save memory and time.
-- Matches sequences using regex for global counts of matches.
-- Handles different Illumina read lengths and query sizes.
-- Outputs matched markers to `MatchedMarkers.txt`.
-- Benchmarks runtime and memory usage.
+### **📌 Overview of the Workflow**
+1. **Script 1: Read Matching & Extraction**  
+   - Takes **sequencing reads** (from `illumina_reads_X.fasta.gz`) and **matches them** to a reference genome (`hg38_xxx.fasta.gz`).
+   - Uses **multi-threaded processing** to improve speed.
+   - **Finds locations** of matches in the reference genome and **records**:
+     - **Start & End positions**  
+     - **Strand orientation** (Forward `F` / Reverse `R`)  
+     - **Matched sequence**
+     - **Upstream and downstream context (20 bp)**
+   - **Outputs:** `matchedseqs.txt` → A table of matched sequences and their genomic positions.
 
-## Prerequisites
-### Windows
-- Install Perl or ActiveState Perl.
-- Optional: Install Valgrind for benchmarking.
+2. **Script 2: Genomic Feature Annotation**  
+   - **Uses `matchedseqs.txt`** from Script 1.
+   - Loads multiple **genomic feature files**:
+     - **GFF3** (Gene annotation)
+     - **TSS file** (Transcription Start Sites)
+     - **CpG island file** (Methylation hotspots)
+     - **RepeatMasker file** (Repetitive elements like SINEs, LINEs)
+   - **Annotates each matched sequence** by:
+     - Finding the **closest gene** and its type.
+     - Checking if the sequence is in a **CpG island**.
+     - Checking if the sequence overlaps with a **repetitive element**.
+   - **Outputs:** `matchedseqs_annotate.txt` → An annotated version of `matchedseqs.txt` with additional biological context.
 
-### MacOS/Linux
-- Perl is pre-installed in most distributions.
-- Optional: Use `/usr/bin/time` for benchmarking.
+### **🔹 Summary of the Pipeline**
+| **Step** | **Script** | **Purpose** | **Output** |
+|----------|-----------|-------------|------------|
+| **1. Read Matching** | `match.pl` | Matches sequencing reads to the reference genome | `matchedseqs.txt` |
+| **2. Genomic Annotation** | `annotate.pl` | Annotates matched sequences with genes, CpG islands, and repeat elements | `matchedseqs_annotate.txt` |
 
-## Installation
-Clone the repository and place the following files in the same directory:
-1. This script (`read_pattern.pl`)
-2. Reference genome file (`hg38_partial.fasta.gz`)
-3. Illumina read files:
-   - `illumina_reads_40.fasta.gz`
-   - `illumina_reads_60.fasta.gz`
-   - `illumina_reads_80.fasta.gz`
-   - `illumina_reads_100.fasta.gz`
-
-## Usage
-### Windows
-Run the script using any Perl-compatible IDE or command line:
-```bash
-perl read_pattern.pl
-```
-
-### MacOS/Linux
-#### Basic Usage:
-```bash
-perl read_pattern.pl
-```
-#### Benchmarking:
-```bash
-/usr/bin/time -l perl read_pattern.pl  # MacOS
-/usr/bin/time -v perl read_pattern.pl  # Linux
-```
-
-## Input Options
-1. Select an Illumina read file:
-   - 1: `illumina_reads_40.fasta.gz`
-   - 2: `illumina_reads_60.fasta.gz`
-   - 3: `illumina_reads_80.fasta.gz`
-   - 4: `illumina_reads_100.fasta.gz`
-
-2. Select a query size for read length = 100:
-   - 1: 1,000 queries
-   - 2: 10,000 queries
-   - 3: 100,000 queries
-   - 4: 1,000,000 queries
-
-## Output
-- Matched marker sequences are written to `MatchedMarkers.txt`.
-- The script prints the total number of matches to the console.
-
-## Benchmarking Details (2023) 
+## Benchmarking Details [match.pl] (2023) 
 
 | Read Length | Query Size | Markers Found | Runtime  | Memory Usage |
 |-------------|------------|---------------|----------|--------------|
@@ -74,7 +43,7 @@ perl read_pattern.pl
 | 100         | 1,000      | 439           | 3.23 min | 341 MB       |
 | 100         | 10,000     | 4,280         | 33 min   | 341 MB       | 
 
-## Benchmarking Details (Jan 2025) 
+## Benchmarking Details [match.pl] (Jan 2025) 
 
 | Read Length | Query Size | Markers Found | Runtime  | Memory Usage |
 |-------------|------------|---------------|----------|--------------|
@@ -94,10 +63,6 @@ perl read_pattern.pl
 | 100 | 10000 | 8822 | 0.23 min | 253.08 MB |
 | 100 | 100000 | 90293 | 2.14 min | 256.41 MB |
 | 100 | 1000000 | 90293 | 2.13 min | 256.41 MB |
-
-## Error Handling
-- Validates `.fasta.gz` file paths.
-- Prompts for re-execution if invalid options are entered.
 
 ## Author 
 
