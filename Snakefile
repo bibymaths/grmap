@@ -1,8 +1,6 @@
 from snakemake.io import glob_wildcards, expand, temp
 
 configfile: "config.yaml"
-
-# Derive samples from reads pattern stored in config
 SAMPLES = glob_wildcards(config["read"].replace("*", "{sample}")).sample
 
 rule all:
