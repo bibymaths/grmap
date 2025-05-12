@@ -1,0 +1,5 @@
+
+read: data/reads/*.fasta.gz
+reference: data/ref/hg38_partial.fasta.gz
+annotate: data/annotations
+scripts_dir: scripts
