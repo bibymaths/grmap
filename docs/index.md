@@ -1,5 +1,7 @@
 # GRmap
- 
+  
+[![Snakemake](https://img.shields.io/badge/snakemake-≥5.6.0-brightgreen.svg?style=flat)](https://snakemake.readthedocs.io)
+
 [![DOI](https://zenodo.org/badge/592387295.svg)](https://doi.org/10.5281/zenodo.15390190)
 
 A Snakemake-driven pipeline to  
