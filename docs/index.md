@@ -1,4 +1,6 @@
 # GRmap
+ 
+[![DOI](https://zenodo.org/badge/592387295.svg)](https://doi.org/10.5281/zenodo.15390190)
 
 A Snakemake-driven pipeline to  
 
