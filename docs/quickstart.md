@@ -3,17 +3,13 @@
 1. **Clone the repo**   
 
 ```bash
-git clone <repo_url> grmap
+git clone https://github.com/bibymaths/grmap
 cd grmap
 ``` 
 
 2. **Edit `config.yaml`**
 
-- Set `read` to your reads pattern, e.g.
-
-```yaml
-read: "data/reads/illumina_reads_*.fasta.gz"
-```
+- Set `read` to your reads pattern.
 - Point `reference`, `annotations`, `scripts_dir`, and `results_dir` to the correct paths.
 
 3. **Create your environment**
