@@ -2,10 +2,15 @@
 
 ## 1. Matching Reads
 
-**Script:** `scripts/match.pl`  
-**Inputs:**  
-- `reads`: Sample FASTA (e.g. `data/reads/illumina_reads_<length>.fasta.gz`)  
-- `reference`: Genome FASTA (e.g. `data/ref/hg38_partial.fasta.gz`)  
+**Script:** `scripts/match.pl`   
+
+**Inputs:**
+
+| Input       | Description                                               |
+|-------------|-----------------------------------------------------------|
+| `reads`     | Sample FASTA (e.g. `data/reads/illumina_reads_<length>.fasta.gz`) |
+| `reference` | Genome FASTA (e.g. `data/ref/hg38_partial.fasta.gz`)      |
+
 
 **Output:**  
 - `results/{sample}.matched` (tab-delimited list of matched regions)
@@ -13,37 +18,11 @@
 **Description:**  
 It takes each input read set and searches against the reference, emitting one line per successful match with coordinates and basic alignment metrics.
 
----
-
-## 2. Annotating Matches
-
-**Script:** `scripts/annotate.pl`  
-**Inputs:**  
-- `results/{sample}.matched`  
-- Annotation files in `data/annotations/`:
-  - `hg38_chr1_geneannotation.gff3.gz` (gene features)
-  - `hg38_chr1_tss.txt.gz` (transcription start sites)
-  - `hg38_cpg.txt.gz` (CpG locations)
-  - `hg38_repeatmasker.bed.gz` (repetitive elements)
-
-**Output:**  
-- `results/{sample}.annotated` (tab-delimited, with annotation columns)
-
-**Description:**  
-It enriches each match record by querying overlap with gene models, TSS positions, CpG sites, and repeat regions.  
-The output adds columns for: 
-
-- Gene ID and feature type  
-- Distance to nearest TSS  
-- CpG count within the matched interval  
-- Overlap with repeat elements  
-
 --- 
- 
-### Matching Reads 
-#### Benchmarking  
 
-##### [match.pl] (Nov 2023) 
+### Benchmarking  
+
+#### [match.pl] (Nov 2023) 
 
 | Read Length | Query Size | Markers Found | Runtime  | Memory Usage |
 |-------------|------------|---------------|----------|--------------|
@@ -53,7 +32,7 @@ The output adds columns for:
 | 100         | 1,000      | 439           | 3.23 min | 341 MB       |
 | 100         | 10,000     | 4,280         | 33 min   | 341 MB       | 
 
-##### [match.pl] (Jan 2025) 
+#### [match.pl] (Jan 2025) 
 
 | Read Length | Query Size | Markers Found | Runtime  | Memory Usage |
 |-------------|------------|---------------|----------|--------------|
@@ -73,3 +52,32 @@ The output adds columns for:
 | 100 | 10000 | 8822 | 0.23 min | 253.08 MB |
 | 100 | 100000 | 90293 | 2.14 min | 256.41 MB |
 | 100 | 1000000 | 90293 | 2.13 min | 256.41 MB |
+
+--- 
+
+## 2. Annotating Matches
+
+**Script:** `scripts/annotate.pl`   
+
+**Inputs:**
+
+| File | Description |
+|------|-------------|
+| `results/{sample}.matched` | Matched read output from previous step |
+| `hg38_chr1_geneannotation.gff3.gz` | Gene features |
+| `hg38_chr1_tss.txt.gz` | Transcription start sites |
+| `hg38_cpg.txt.gz` | CpG locations |
+| `hg38_repeatmasker.bed.gz` | Repetitive elements |
+
+
+**Output:**  
+- `results/{sample}.annotated` (tab-delimited, with annotation columns)
+
+**Description:**  
+It enriches each match record by querying overlap with gene models, TSS positions, CpG sites, and repeat regions.  
+The output adds columns for: 
+
+- Gene ID and feature type  
+- Distance to nearest TSS  
+- CpG count within the matched interval  
+- Overlap with repeat elements  

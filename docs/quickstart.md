@@ -1,9 +1,11 @@
 # Quickstart
 
-1. **Clone the repo**  
-   ```bash
-   git clone <repo_url> grmap
-   cd grmap
+1. **Clone the repo**   
+
+```bash
+git clone <repo_url> grmap
+cd grmap
+``` 
 
 2. **Edit `config.yaml`**
 
