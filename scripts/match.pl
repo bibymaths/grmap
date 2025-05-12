@@ -76,6 +76,7 @@ my $actual_queries = scalar @queries;
 # Detect number of cores
 #-----------------------------------------------------
 my $num_cores = `lscpu -p | grep -v '^#' | wc -l`;
+#my $num_cores = 2;
 chomp($num_cores);
 
 #-----------------------------------------------------

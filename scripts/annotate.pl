@@ -35,6 +35,7 @@ my $out_fh = *STDOUT;
 
 # Detect number of CPU cores for parallel processing
 my $num_cores = `lscpu -p | grep -v '^#' | wc -l`;
+#my $num_cores = 2;
 chomp($num_cores);
 my $pm = Parallel::ForkManager->new($num_cores);
 
