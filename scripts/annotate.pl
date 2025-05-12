@@ -30,6 +30,9 @@ use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 # Global data structures for genomic features
 my (%genes, %tss, %cpg, %repeats, %sorted_cpg, %sorted_repeats);
 
+# Output goes to STDOUT by default
+my $out_fh = *STDOUT;
+
 # Detect number of CPU cores for parallel processing
 my $num_cores = `lscpu -p | grep -v '^#' | wc -l`;
 chomp($num_cores);
@@ -272,8 +275,9 @@ sub process_matched_sequences {
     my ($input_file) = @_;
     open my $fh, "<", $input_file or die "Cannot open input file ($input_file): $!\n";
 
-    my $output_file = "matchedseqs_annotate.txt";
-    open my $out_fh, ">", $output_file or die "Cannot open output file ($output_file): $!\n";
+#    my $output_file = "matchedseqs_annotate.txt";
+#    open my $out_fh, ">", $output_file or die "Cannot open output file ($output_file): $!\n";
+
     # Output header with separate columns for each annotation source
     print $out_fh join("\t",
         "Start", "End", "Strand", "MatchedSeq", "Occurrences", "Chromosome",
@@ -282,7 +286,7 @@ sub process_matched_sequences {
         "InCpG", "CpG_GC_Content", "CpG_ObsExp",
         "Repeat_Name", "Repeat_Class", "Repeat_Length"
     ), "\n";
-    close $out_fh;
+#    close $out_fh;
 
     my $temp_dir = "/tmp/perl_parallel";
     mkdir $temp_dir unless -d $temp_dir;
@@ -324,7 +328,7 @@ sub process_matched_sequences {
 
     # Merge temporary files into the final output file
     opendir my $dir, $temp_dir or die "Cannot open temp dir ($temp_dir): $!\n";
-    open $out_fh, ">>", $output_file or die "Cannot open output file ($output_file): $!\n";
+#    open $out_fh, ">>", $output_file or die "Cannot open output file ($output_file): $!\n";
     while (my $file = readdir($dir)) {
         next unless $file =~ /^process_\d+\.txt$/;
         open my $in_fh, "<", "$temp_dir/$file" or next;
@@ -333,7 +337,7 @@ sub process_matched_sequences {
         unlink "$temp_dir/$file";
     }
     closedir $dir;
-    close $out_fh;
+#    close $out_fh;
 }
 
 ############################################
@@ -350,5 +354,5 @@ load_cpg_data($cpg_file);
 load_repeatmasker_data($repeat_file);
 process_matched_sequences($input_file);
 
-print "Done.\n";
+#print "Done.\n";
 exit 0;

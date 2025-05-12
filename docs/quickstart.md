@@ -16,7 +16,8 @@ cd grmap
 
 ```bash
 conda create -n grmap -c conda-forge -c bioconda snakemake matplotlib numpy=1.26
-conda activate grmap
+conda activate grmap 
+sudo cpan Parallel::ForkManager IO::Uncompress::Gunzip
 ```
 
 4. **Run the pipeline**

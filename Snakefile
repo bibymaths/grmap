@@ -16,10 +16,11 @@ rule match:
     output:
         temp("results/{sample}.matched")
     params:
-        script=config["scripts_dir"] + "/match.pl"
+        script=config["scripts_dir"] + "/match.pl",
+        query= lambda wc: str(config["querysize"])
     shell:
         """
-        {params.script} {input.reads} {input.ref} > {output}
+        perl {params.script} {input.reads} {input.ref} {params.query} > {output}
         """
 
 rule annotate:
@@ -35,5 +36,5 @@ rule annotate:
         script=config["scripts_dir"] + "/annotate.pl"
     shell:
         """
-        {params.script} {input.matches} {input.gff} {input.tss} {input.cpg} {input.repeat} > {output}
+        perl {params.script} {input.matches} {input.gff} {input.tss} {input.cpg} {input.repeat} > {output}
         """

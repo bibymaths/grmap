@@ -26,43 +26,9 @@
 use strict;
 use warnings; 
 use diagnostics;
-use bytes;  # Force byte semantics for DNA sequences
+use bytes;
 use Time::HiRes qw(gettimeofday tv_interval);
  
-#-----------------------------------------------------
-# Usage message and command-line argument processing
-#-----------------------------------------------------
-sub usage {
-    print <<"END_USAGE";
-Usage: $0 <reads_choice> <query_choice>
-
-  <reads_choice> options:
-      1   Use illumina_reads_40.fasta.gz
-      2   Use illumina_reads_60.fasta.gz
-      3   Use illumina_reads_80.fasta.gz
-      4   Use illumina_reads_100.fasta.gz
-
-  <query_choice> options:
-      1   Load 1,000 queries
-      2   Load 10,000 queries
-      3   Load 100,000 queries
-      4   Load 1,000,000 queries
-
-Example:
-  $0 2 3
-    => Use illumina_reads_60.fasta.gz and load 100,000 queries.
-
-END_USAGE
-    exit 1;
-}
-
-# If no arguments or help flag provided, show usage.
-if ( @ARGV != 2 or $ARGV[0] eq '--help' or $ARGV[0] eq '-h' ) {
-    usage();
-}
-
-my ($reads_choice, $query_choice) = @ARGV; 
-
 #-----------------------------------------------------
 # Record initial time and memory usage
 #-----------------------------------------------------
@@ -70,23 +36,26 @@ my $start_time      = [gettimeofday()];
 my $start_timestamp = scalar(localtime());
 my $start_mem       = get_memory_usage();
 
-#-----------------------------------------------------
-# File and Parameter Setup
-#-----------------------------------------------------
-my $ref_file   = 'hg38_partial.fasta.gz';
-my %reads_map  = (
-    1 => 'illumina_reads_40.fasta.gz',
-    2 => 'illumina_reads_60.fasta.gz',
-    3 => 'illumina_reads_80.fasta.gz',
-    4 => 'illumina_reads_100.fasta.gz',
-);
-my @query_opts = ( 1000, 10_000, 100_000, 1_000_000 );
-my $result_file = 'matchedseqs.txt'; 
- 
-# Validate command-line arguments.
-exists $reads_map{$reads_choice} or die "Invalid read file choice: $reads_choice\n";
-$query_choice =~ /^[1-4]$/ or die "Invalid query choice: $query_choice\n";
-my $num_queries = $query_opts[$query_choice - 1];
+#----------------------------------------
+# Usage: match.pl <reads.fasta.gz> <ref.fasta.gz> [<max_queries>]
+#----------------------------------------
+sub usage {
+  die <<"USAGE";
+Usage: $0 <reads_file> <reference_file> [<max_queries>]
+   <reads_file>     FASTA or FASTA.GZ of your markers
+   <reference_file> FASTA or FASTA.GZ of your reference
+   <max_queries>    (optional) number of reads to load; default = all
+USAGE
+}
+
+# require at least two arguments
+usage() if @ARGV < 2;
+
+# assign files directly
+my ($reads_file, $ref_file, $num_queries) = @ARGV;
+$num_queries //= 0;   # zero or undef -> load _all_ sequences
+#my $result_file = 'matchedseqs.txt';
+my $OUT = *STDOUT;    # send everything to STDOUT
 
 #-----------------------------------------------------
 # Read Reference Genome
@@ -98,12 +67,13 @@ die "Reference genome is empty!\n" unless length($DNA);
 # Load marker sequences (queries)
 # Now each query is stored as a hash with key 'id' and 'seq'
 #-----------------------------------------------------
-my $reads_file = $reads_map{$reads_choice};
-my @queries = read_n_sequences($reads_file, $num_queries);
+my @queries = $num_queries
+  ? read_n_sequences($reads_file, $num_queries)
+  : read_n_sequences($reads_file);   # load all if no limit
 my $actual_queries = scalar @queries;
 
 #-----------------------------------------------------
-# Detect number of cores (using external command)
+# Detect number of cores
 #-----------------------------------------------------
 my $num_cores = `lscpu -p | grep -v '^#' | wc -l`;
 chomp($num_cores);
@@ -148,9 +118,11 @@ my $elapsed       = tv_interval($start_time, $end_time);
 my $end_mem       = get_memory_usage();
 
 #-----------------------------------------------------
-# Combine temporary files into final output file with header
+# Combine temporary files into final output
 #-----------------------------------------------------
-open(my $OUT, '>', $result_file) or die "Cannot open $result_file: $!";
+
+#open(my $OUT, '>', $result_file) or die "Cannot open $result_file: $!";
+
 print $OUT "# ReferenceFile: $ref_file\n";
 print $OUT "# QueryFile: $reads_file\n";
 print $OUT "# Total Queries Processed: $actual_queries\n";
@@ -176,9 +148,11 @@ foreach my $child_pid (@child_pids) {
         unlink $tmp_file or warn "Couldn't remove $tmp_file: $!";
     }
 }
-close $OUT or die "Cannot close $result_file: $!";
-print "\nDone. $total_matched match(es) reported.\n";
-print "See '$result_file' for the matched markers.\n";
+#-----------------------------------------------------
+#close $OUT or die "Cannot close $result_file: $!";
+#print "\nDone. $total_matched match(es) reported.\n";
+#print "See '$result_file' for the matched markers.\n";
+#-----------------------------------------------------
 exit 0;
 
 #=====================================================
@@ -195,8 +169,8 @@ sub get_memory_usage {
     my $mem = `ps -o rss= -p $pid`;
     chomp($mem);
     return $mem;  # in KB
-} 
- 
+}
+
 #-----------------------------------------------------
 # Subroutine: format_memory_usage
 # Converts a memory value in KB into a human-readable string,
@@ -260,7 +234,8 @@ sub read_n_sequences {
         if ($line =~ /^>(.*)/) {
             if ($seq ne '') {
                 push @list, { id => $id, seq => $seq };
-                last if @list == $max;
+                # only stop early if the caller really passed a max>0
+                last if defined($max) && $max > 0 && @list == $max;
                 $seq = '';
             }
             $id = $1;  # capture header (without '>')
@@ -269,7 +244,8 @@ sub read_n_sequences {
             $seq .= $line;
         }
     }
-    if ($seq ne '' and @list < $max) {
+    # always push the final sequence
+    if ($seq ne '') {
         push @list, { id => $id, seq => $seq };
     }
     close $fh;
