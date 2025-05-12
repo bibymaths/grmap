@@ -19,4 +19,5 @@ reference: "data/ref/hg38_partial.fasta.gz"
 annotations: "data/annotations"
 scripts_dir: "scripts"
 results_dir: "results"
-cores: 4
+cores: 4 
+```

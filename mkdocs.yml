@@ -1,4 +1,4 @@
-site_name: GRMAP
+site_name: GRmap
 site_description: 'Documentation for matching sequencing reads to a reference genome and annotating the matched sequences with genomic features.'
 site_author: 'Abhinav Mishra'
 site_url: https://bibymaths.github.io/grmap
@@ -38,4 +38,4 @@ watch:
   - docs
 
 copyright: >
-  Copyright &copy; 2025 <a href="https://bibymaths.github.io">Abhinav Mishra</a>.
+  Copyright &copy; 2023 <a href="https://bibymaths.github.io">Abhinav Mishra</a>.

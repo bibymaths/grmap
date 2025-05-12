@@ -11,7 +11,7 @@
 - `results/{sample}.matched` (tab-delimited list of matched regions)
 
 **Description:**  
-`match.pl` takes each input read set and searches against the reference, emitting one line per successful match with coordinates and basic alignment metrics.
+It takes each input read set and searches against the reference, emitting one line per successful match with coordinates and basic alignment metrics.
 
 ---
 
@@ -30,7 +30,9 @@
 - `results/{sample}.annotated` (tab-delimited, with annotation columns)
 
 **Description:**  
-`annotate.pl` enriches each match record by querying overlap with gene models, TSS positions, CpG sites, and repeat regions. The output adds columns for:
+It enriches each match record by querying overlap with gene models, TSS positions, CpG sites, and repeat regions.  
+The output adds columns for: 
+
 - Gene ID and feature type  
 - Distance to nearest TSS  
 - CpG count within the matched interval  
@@ -41,7 +43,7 @@
 ### Matching Reads 
 #### Benchmarking  
 
-# Benchmarking Details [match.pl] (Nov 2023) 
+##### [match.pl] (Nov 2023) 
 
 | Read Length | Query Size | Markers Found | Runtime  | Memory Usage |
 |-------------|------------|---------------|----------|--------------|
@@ -51,7 +53,7 @@
 | 100         | 1,000      | 439           | 3.23 min | 341 MB       |
 | 100         | 10,000     | 4,280         | 33 min   | 341 MB       | 
 
-## Benchmarking Details [match.pl] (Jan 2025) 
+##### [match.pl] (Jan 2025) 
 
 | Read Length | Query Size | Markers Found | Runtime  | Memory Usage |
 |-------------|------------|---------------|----------|--------------|

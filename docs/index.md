@@ -1,13 +1,16 @@
 # GRmap
 
-A Snakemake-driven pipeline to
-1. **Match** sequencing reads against a reference  
-2. **Annotate** matched regions with gene, CpG, TSS, and repeat information  
+A Snakemake-driven pipeline to  
 
-**Key features**  
-- Modular: separate match and annotate steps  
-- Configurable via `config.yaml`  
-- Handles compressed FASTA and GFF/BED inputs  
+- **Match** sequencing reads against a reference  
+- **Annotate** matched regions with gene, CpG, TSS, and repeat information  
+
+**Key features**    
+
+- Fast and efficient read matching 
+- Handles compressed FASTA and GFF/BED inputs   
+- Supports multiple read lengths and query sizes
+- Configurable via `config.yaml`
 - Outputs per-sample annotation files in `results/`
 
 ---
