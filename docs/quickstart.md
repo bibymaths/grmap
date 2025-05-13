@@ -23,7 +23,7 @@ sudo cpan Parallel::ForkManager IO::Uncompress::Gunzip
 4. **Run the pipeline**
 
 ```bash
-snakemake --cores 2
+snakemake --cores 1 --report results/report.html --report-after-run
 ```
 
 5. **View outputs** 

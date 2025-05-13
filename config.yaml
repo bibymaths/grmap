@@ -1,4 +1,4 @@
-querysize: 1000
+querysize: 10
 read: data/reads/*.fasta.gz
 reference: data/ref/hg38_partial.fasta.gz
 annotate: data/annotations

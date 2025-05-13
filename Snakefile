@@ -1,6 +1,6 @@
 
 from matplotlib.ticker import MaxNLocator
-from snakemake.io import glob_wildcards, expand, temp
+from snakemake.io import glob_wildcards, expand, temp, report, directory
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -8,6 +8,7 @@ from matplotlib.patches import Patch
 import matplotlib
 matplotlib.use("Agg")
 
+report: "report/workflow.rst"
 configfile: "config.yaml"
 SAMPLES = glob_wildcards(config["read"].replace("*", "{sample}")).sample
 RESULTS = config["results"]
@@ -44,7 +45,12 @@ rule annotate:
         cpg=config["annotate"] + "/hg38_cpg.txt.gz",
         repeat=config["annotate"] + "/hg38_repeatmasker.bed.gz"
     output:
-        RESULTS + "/{sample}.annotated"
+        report(
+            RESULTS + "/{sample}.annotated",
+            caption="report/annotate_sample.rst",
+            category="Annotation",
+            subcategory="{sample}"
+        )
     params:
         script=config["scripts_dir"] + "/annotate.pl"
     shell:
@@ -56,7 +62,11 @@ rule merge_annotated:
     input:
         expand(RESULTS + "/{sample}.annotated", sample=SAMPLES)
     output:
-        RESULTS + "/all_samples.annotated.tsv"
+        report(
+            RESULTS + "/all_samples.annotated.tsv",
+            caption="report/annotated_summary.rst",
+            category="Summary"
+        )
     shell:
         """
         head -n1 {RESULTS}/{SAMPLES[0]}.annotated > {output}
@@ -67,7 +77,11 @@ rule summarize_matches:
     input:
         merged=RESULTS + "/all_samples.annotated.tsv"
     output:
-        RESULTS + "/summary_counts.txt"
+        report(
+            RESULTS + "/summary_counts.txt",
+            caption="report/summary_counts.rst",
+            category="Summary"
+        )
     shell:
         """
         cut -f9,10,15 {input.merged} \\
@@ -82,33 +96,42 @@ rule plot_counts_and_cpg_gc:
     input:
         RESULTS + "/summary_counts.txt"
     output:
-        RESULTS + "/gene_counts.png",
-        RESULTS + "/gene_cpg_gc.png"
+        report(
+            RESULTS + "/gene_counts.png",
+            caption="report/gene_counts.rst",
+            category="Plots",
+            labels={"measure": "count"}
+        ),
+        report(
+            RESULTS + "/gene_cpg_gc.png",
+            caption="report/gene_cpg_gc.rst",
+            category="Plots",
+            labels={"measure": "cpg_gc_content"}
+        )
     run:
         df = pd.read_csv(
             input[0],sep="\t",header=None,
             names=["gene_type", "gene_id", "cpg_gc_content", "count"]
         )
-        # assign colors per gene_type
+
         types = df["gene_type"].unique()
         cmap = plt.get_cmap("tab10")
         color_map = {t: cmap(i % cmap.N) for i, t in enumerate(types)}
         bar_colors = df["gene_type"].map(color_map)
 
         fig, ax = plt.subplots(figsize=(16, 8))
-        # sort by count
+
         df = df.sort_values(by="count", ascending=False)
-        # plot bars
+
         ax.bar(df["gene_id"], df["count"], color=bar_colors)
 
-        # X axis label
         ax.set_xlabel(
             "Gene",
             fontsize=10,
             fontstyle="normal",
             fontfamily="serif"
         )
-        # Y axis label
+
         ax.set_ylabel(
             "Count",
             fontsize=10,
@@ -133,7 +156,7 @@ rule plot_counts_and_cpg_gc:
             labelcolor="black"
         )
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        # legend with custom font
+
         handles = [Patch(color=color_map[t], label=t) for t in types]
         legend = ax.legend(
             handles=handles,
@@ -143,7 +166,7 @@ rule plot_counts_and_cpg_gc:
             frameon=True,
             loc="best"
         )
-        # optionally style legend text
+
         for text in legend.get_texts():
             text.set_fontfamily("sans-serif")
             text.set_fontstyle("normal")
@@ -175,12 +198,21 @@ rule plot_counts_and_cpg_gc:
             plt.tight_layout()
             fig2.savefig(output[1], dpi=300)
             plt.close(fig2)
+        else:
+            # Ensure file exists to not break downstream rules
+            with open(output[1],"w") as f:
+                f.write("# No data available for CpG GC content\n")
 
 rule plot_tss_distance:
     input:
         RESULTS + "/all_samples.annotated.tsv"
     output:
-        RESULTS + "/tss_distance.png"
+        report(
+            RESULTS + "/tss_distance.png",
+            caption="report/tss_distance.rst",
+            category="Plots",
+            labels={"plot": "histogram"}
+        )
     run:
         df = pd.read_csv(input[0], sep="\t", comment="#", header=0)
         df = df[(df["TSS_Distance"] != "N/A") & (df["TSS_Gene_Type"] != "N/A")]
@@ -210,7 +242,12 @@ rule plot_tss_type:
     input:
         RESULTS + "/all_samples.annotated.tsv"
     output:
-        RESULTS + "/tss_type.png"
+        report(
+            RESULTS + "/tss_type.png",
+            caption="report/tss_type.rst",
+            category="Plots",
+            labels={"plot": "boxplot"}
+        )
     run:
         df = pd.read_csv(input[0], sep="\t", comment="#", header=0)
         df = df[(df["TSS_Distance"] != "N/A") & (df["TSS_Gene_Type"] != "N/A")]
@@ -232,3 +269,4 @@ rule plot_tss_type:
         plt.tight_layout()
         plt.savefig(output[0], dpi=300)
         plt.close()
+
