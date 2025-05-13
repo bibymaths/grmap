@@ -9,7 +9,6 @@ Edit `config.yaml` with the following keys:
 | `annotations` | Directory containing annotation files        | `data/annotations`                              |
 | `scripts_dir` | Directory containing the Perl scripts        | `scripts`                                       |
 | `results_dir` | Output directory for pipeline results        | `results`                                       |
-| `cores`       | Number of parallel jobs for Snakemake        | `4`                                             |
 
 Example `config.yaml`:
 
@@ -19,5 +18,4 @@ reference: "data/ref/hg38_partial.fasta.gz"
 annotations: "data/annotations"
 scripts_dir: "scripts"
 results_dir: "results"
-cores: 4 
 ```

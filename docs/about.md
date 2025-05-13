@@ -1,6 +1,5 @@
 # About
 
-**GRmap** is a simple genomics pipeline by Abhinav Mishra.   
+*GRmap* is a simple genomics pipeline by **Abhinav Mishra**, built on Perl at its core, and driven by Snakemake.  
 
-- **Language**: Python, Perl
-- **Contact**: mishraabhinav36@gmail.com
+**email**: [mishraabhinav36@gmail.com](mishraabhinav36@gmail.com)
